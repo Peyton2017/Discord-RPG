@@ -4,7 +4,7 @@
     "NAME" : "AlcherRPG",
     "SHORT" : "A fun Discord RPG",
     "DESCRIPTION" : "A fun Discord RPG for anyone to use!",
-    "TAGS" : ["discord rpg", "game", "entertainment"],
+    "TAGS" : ["discord rpg", "game", "entertainment", "rpg"],
     "REQUIREMENTS" : [],
     "HIDDEN" : false
 }
