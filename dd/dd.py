@@ -11,17 +11,6 @@ import time
 import json
 import random
 import re
-try:
-    import scipy
-    import scipy.misc
-    import scipy.cluster
-except:
-    pass
-
-#[Bows] * [Basic Bow] [Sharp Bow]
-#[Swords] * [Basic shortblade] - [Basic longblade]
-#[Daggers] * [Basic Dagger] - [Sharp Dagger]
-#[Magic] * [Basic Staff] [Sharp Staff]
 
 prefix = fileIO("data/red/settings.json", "load")['PREFIXES']
 
