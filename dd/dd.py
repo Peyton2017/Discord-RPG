@@ -19,7 +19,6 @@ dev = ["312127693242236928"]
 class AlcherRPG:
     def __init__(self, bot):
         self.bot = bot
-        self.settings = fileIO("data/alcher/settings.json", "load")
 
     def _is_mention(self,user):
         if "mention" not in self.settings.keys() or self.settings["mention"]:
