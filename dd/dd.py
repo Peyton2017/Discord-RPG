@@ -244,18 +244,18 @@ class AlcherRPG:
             xpgain = random.randint(10, 25)
         elif userinfo["selected_enemy"] == "Wolf":
             enemydmg += random.randint(10, 40)
-            enemygold += random.randint(40, 90)
-            goldlost += random.randint(0, 160)
+            enemygold = random.randint(40, 90)
+            goldlost = random.randint(0, 160)
             xpgain = random.randint(10, 30)
         elif userinfo["selected_enemy"] == "Goblin":
             enemydmg += random.randint(10, 60)
-            enemygold += random.randint(40, 140)
-            goldlost += random.randint(0, 160)
+            enemygold = random.randint(40, 140)
+            goldlost = random.randint(0, 160)
             xpgain = random.randint(10, 30)
         elif userinfo["selected_enemy"] == "Zombie":
             enemydmg += random.randint(10, 40)
-            enemygold += random.randint(40, 90)
-            goldlost += random.randint(0, 160)
+            enemygold = random.randint(40, 90)
+            goldlost = random.randint(0, 160)
             xpgain = random.randint(10, 30)
 
         #YOUR SKILL OPTIONS LIST
