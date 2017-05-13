@@ -11,10 +11,21 @@ import time
 import json
 import random
 import re
+try:
+    import scipy
+    import scipy.misc
+    import scipy.cluster
+except:
+    pass
+
+#[Bows] * [Basic Bow] [Sharp Bow]
+#[Swords] * [Basic shortblade] - [Basic longblade]
+#[Daggers] * [Basic Dagger] - [Sharp Dagger]
+#[Magic] * [Basic Staff] [Sharp Staff]
 
 prefix = fileIO("data/red/settings.json", "load")['PREFIXES']
 
-dev = ["312127693242236928"]
+dev = ["135204842544168961"]
 
 class AlcherRPG:
     def __init__(self, bot):
@@ -95,7 +106,7 @@ class AlcherRPG:
         await asyncio.sleep(2)
         await self.bot.say("Welcome to Discord Dungeons!\n\nMay i ask what race you are?\n`Choose one`\nOrc\nHuman\nTenti")
 
-        answer1 = await self.check_answer(ctx, ["orc", "human", "tenti", "/start"])
+        answer1 = await self.check_answer(ctx, ["orc", "human", "tenti", ">start"])
 
         if answer1 == ">start":
             pass
@@ -111,7 +122,7 @@ class AlcherRPG:
 
         await self.bot.reply("Great!\nWhat Class are you?\n`Choose one`\nArcher\nPaladin\nMage\nThief")
 
-        answer2 = await self.check_answer(ctx, ["archer", "paladin", "mage", "thief", "/start"])
+        answer2 = await self.check_answer(ctx, ["archer", "paladin", "mage", "thief", ">start"])
 
         if answer2 == ">start":
             return
@@ -178,16 +189,24 @@ class AlcherRPG:
                 userinfo["selected_enemy"] = debi
                 fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
 
-                if userinfo["selected_enemy"] == "Rachi" or userinfo["selected_enemy"] == "Wolf" or userinfo["selected_enemy"] == "Draugr":
+                if userinfo["selected_enemy"] == "Rachi" or userinfo["selected_enemy"] == "Draugr":
                     userinfo["enemyhp"] = random.randint(50, 75)
                     fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
-                elif userinfo["selected_enemy"] == "Debin" or userinfo["selected_enemy"] == "Goblin" or userinfo["selected_enemy"] == "Stalker":
+                elif userinfo["selected_enemy"] == "Debin" or userinfo["selected_enemy"] == "Stalker":
                     userinfo["enemyhp"] = random.randint(50, 100)
                     fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
-                elif userinfo["selected_enemy"] == "Oofer" or userinfo["selected_enemy"] == "Zombie" or userinfo["selected_enemy"] == "Souleater":
+                elif userinfo["selected_enemy"] == "Oofer" or userinfo["selected_enemy"] == "Souleater":
                     userinfo["enemyhp"] = random.randint(75, 125)
                     fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)    
-
+                elif userinfo["selected_enemy"] == "Wolf":
+                    userinfo["enemyhp"] = random.randint(150, 200)
+                    fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo) 
+                elif userinfo["selected_enemy"] == "Goblin":
+                    userinfo["enemyhp"] = random.randint(125, 150)
+                    fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)  
+                elif userinfo["selected_enemy"] == "Zombie":
+                    userinfo["enemyhp"] = random.randint(175, 225)
+                    fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo) 
             elif answer1 == "n" or answer1 == "N" or answer1 == "no" or answer1 == "No":
                 await self.bot.say("Ok then.")
                 return
@@ -201,25 +220,48 @@ class AlcherRPG:
             youdmg += random.randint(5, 25)
         elif userinfo["equip"] == "Simple Sword":
             youdmg += random.randint(5, 25)
+        elif userinfo["equip"] == "Sprine Dagger":
+            youdmg += random.randint(10, 60)
+        elif userinfo["equip"] == "Sprine Staff":
+            youdmg += random.randint(10, 60)
+        elif userinfo["equip"] == "Sprine Bow":
+            youdmg += random.randint(10, 60)
+        elif userinfo["equip"] == "Sprine Sword":
+            youdmg += random.randint(10, 60)
 
-        #ENEMY DAMAGE BASED ON PLANET ENEMY GROUPS
+        #ENEMY DAMAGE BASED ON ENEMY GROUPS
         enemydmg = 0
 
-        if userinfo["selected_enemy"] == "Rachi" or userinfo["selected_enemy"] == "Wolf" or userinfo["selected_enemy"] == "Draugr":
+        if userinfo["selected_enemy"] == "Rachi" or userinfo["selected_enemy"] == "Draugr":
             enemydmg += random.randint(0, 10)
             enemygold = random.randint(25, 40)
             goldlost = random.randint(0, 60)
             xpgain = random.randint(5, 10)
-        elif userinfo["selected_enemy"] == "Debin" or userinfo["selected_enemy"] == "Goblin" or userinfo["selected_enemy"] == "Stalker":
+        elif userinfo["selected_enemy"] == "Debin" or userinfo["selected_enemy"] == "Stalker":
             enemydmg += random.randint(0, 20)
             enemygold = random.randint(25, 50)
             goldlost = random.randint(0, 70)
             xpgain = random.randint(5, 20)
-        elif userinfo["selected_enemy"] == "Oofer" or userinfo["selected_enemy"] == "Zombie" or userinfo["selected_enemy"] == "Souleater":
+        elif userinfo["selected_enemy"] == "Oofer" or userinfo["selected_enemy"] == "Souleater":
             enemydmg += random.randint(0, 30)
             enemygold = random.randint(35, 70)
             goldlost = random.randint(0, 80)
             xpgain = random.randint(10, 25)
+        elif userinfo["selected_enemy"] == "Wolf":
+            enemydmg += random.randint(10, 40)
+            enemygold += random.randint(40, 90)
+            goldlost += random.randint(0, 160)
+            xpgain = random.randint(10, 30)
+        elif userinfo["selected_enemy"] == "Goblin":
+            enemydmg += random.randint(10, 60)
+            enemygold += random.randint(40, 140)
+            goldlost += random.randint(0, 160)
+            xpgain = random.randint(10, 30)
+        elif userinfo["selected_enemy"] == "Zombie":
+            enemydmg += random.randint(10, 40)
+            enemygold += random.randint(40, 90)
+            goldlost += random.randint(0, 160)
+            xpgain = random.randint(10, 30)
 
         #YOUR SKILL OPTIONS LIST
         show_list = []
@@ -240,12 +282,14 @@ class AlcherRPG:
             options.append("cast")
             options.append("Cast")
             show_list.append("Cast")
-        #IF FOR WHATEVER REASON THE USER DOES /fight AGAIN, RETURN
+        #IF FOR WHATEVER REASON THE USER DOES >fight AGAIN, RETURN
         em = discord.Embed(description="<@{}> ```diff\n+ What skill would you like to use?\n\n- Choose one\n+ {}```".format(user.id, "\n+".join(show_list)), color=discord.Color.blue())
         await self.bot.say(embed=em)
         answer2 = await self.check_answer(ctx, options)
+
         if answer2 == ">fight":
-            pass
+            return
+
         #DEFINE WHAT SKILL WE SELECTED
         if answer2 == "cast" or answer2 == "Cast":
             move = "Cast"
@@ -381,6 +425,10 @@ class AlcherRPG:
             options.append("(1) Saker Keep")
             options2.append("1")
 
+        if userinfo["lvl"] >= 10:
+            options.append("(2) The Forest")
+            options2.append("2")
+
         em = discord.Embed(description="<@{}>\n```diff\n+ Where would you like to travel?\n- Type a location number in the chat.\n+ {}```".format(user.id, "\n+ ".join(options)), color=discord.Color.blue())
         await self.bot.say(embed=em)
 
@@ -403,6 +451,15 @@ class AlcherRPG:
             else:
                 location_name = "Saker Keep"
                 userinfo["location"] = "Saker Keep"
+
+        elif answer1 == "2":
+            if userinfo["location"] == "The Forest":
+                em = discord.Embed(description="<@{}>\n```diff\n- You're already at {}!```".format(user.id, userinfo["location"]), color=discord.Color.red())
+                await self.bot.say(embed=em)
+                return
+            else:
+                location_name = "The Forest"
+                userinfo["location"] = "The Forest"
 
         em = discord.Embed(description="<@{}>\n```diff\n+ Traveling to {}...```".format(user.id, location_name), color=discord.Color.red())
         await self.bot.say(embed=em)
@@ -467,28 +524,128 @@ class AlcherRPG:
         if userinfo["race"] and userinfo["class"] == "None":
             await self.bot.say("Please start your character using `>start`")
             return
-        options = [">buy", "hp"]
-        weapon_list = []
-        weapon_list.append("HP")
-        em = discord.Embed(description="```diff\n+ What would you like to buy?\n- More weapons will be unlocked the more you level up\n{}```".format("\n".join(weapon_list)), color=discord.Color.blue())
-        await self.bot.say(embed=em)
-        answer1 = await self.check_answer(ctx, options)
+        weapons_list = ["hp","Hp", "Sprine sword", "sprine sword", "Sprine bow", "sprine bow", "Sprine dagger", "sprine dagger", "Sprine staff", "sprine staff"]
+        if ctx.invoked_subcommand is None:
+            em = discord.Embed(description="```>buy item_name\n\nNote: It must all be lowercase.```", color=discord.Color.blue())
+            await self.bot.say(embed=em)
 
-        if answer1 == ">buy":
-            pass
+    @buy.command(pass_context=True)
+    async def hp(self, ctx, *, ammount : int):
+        user = ctx.message.author
+        userinfo = fileIO("data/alcher/players/{}/info.json".format(user.id), "load")
+        Sum = ammount * 30
 
-        elif answer1 == "hp" or answer1 == "HP" or answer1 == "Hp":
-            if userinfo["gold"] < 30:
-                em = discord.Embed(description="```diff\n- You dont have enough gold for this item, this item costs 30 gold.```", color=discord.Color.blue())
+        if ammount == None:
+            ammount = 1
+
+        if userinfo["gold"] < Sum:
+            needed = Sum - userinfo["gold"]
+            em = discord.Embed(description="```diff\n- You need {} more gold for {} potion(s)```".format(needed, ammount), color=discord.Color.red())
+            await self.bot.say(embed=em)
+        else:   
+            userinfo["gold"] = userinfo["gold"] - Sum
+            userinfo["hp_potions"] = userinfo["hp_potions"] + int(ammount)
+            fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
+            em = discord.Embed(description="```diff\n+ You bought {} potion(s) for {} Gold```".format(ammount, Sum), color=discord.Color.blue())
+            await self.bot.say(embed=em)
+
+    @buy.command(pass_context=True)
+    async def item(self, ctx, *, item):
+        user = ctx.message.author
+        userinfo = fileIO("data/alcher/players/{}/info.json".format(user.id), "load")
+        if item == "sprine sword":
+            if not userinfo["class"] == "Paladin":
+                em = discord.Embed(description="```diff\n- You need to be a Paladin to buy this item.```", color=discord.Color.red())
                 await self.bot.say(embed=em)
                 return
+            cost = 1000
+            value = cost - userinfo["gold"]
+            if userinfo["gold"] < cost:
+                em = discord.Embed(description="```diff\n- You need {} more Gold to buy this item.```".format(value), color=discord.Color.red())
+                await self.bot.say(embed=em)
             else:
-                userinfo["gold"] = userinfo["gold"] - 30
-                userinfo["hp_potions"] = userinfo["hp_potions"] + 1
+                cost = 1000
+                userinfo["gold"] = userinfo["gold"] - cost
+                userinfo["inventory"].append("Sprine Sword")
                 fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
-                em = discord.Embed(description="```diff\n+ You bought a Health Potion for 30 gold.```", color=discord.Color.blue())
+                em = discord.Embed(description="```diff\n+ You bought the item for {} Gold.```".format(cost), color=discord.Color.blue())
+                await self.bot.say(embed=em)
+
+        elif item == "sprine dagger":
+            if not userinfo["class"] == "Thief":
+                em = discord.Embed(description="```diff\n- You need to be a Thief to buy this item.```", color=discord.Color.red())
                 await self.bot.say(embed=em)
                 return
+            cost = 1000
+            value = cost - userinfo["gold"]
+            if userinfo["gold"] < cost:
+                em = discord.Embed(description="```diff\n- You need {} more Gold to buy this item.```".format(value), color=discord.Color.red())
+                await self.bot.say(embed=em)
+            else:
+                cost = 1000
+                userinfo["gold"] = userinfo["gold"] - cost
+                userinfo["inventory"].append("Sprine Dagger")
+                fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
+                em = discord.Embed(description="```diff\n+ You bought the item for {} Gold.```".format(cost), color=discord.Color.blue())
+                await self.bot.say(embed=em)
+
+        elif item == "sprine bow":
+            if not userinfo["class"] == "Archer":
+                em = discord.Embed(description="```diff\n- You need to be an Archer to buy this item.```", color=discord.Color.red())
+                await self.bot.say(embed=em)
+                return
+            cost = 1000
+            value = cost - userinfo["gold"]
+            if userinfo["gold"] < cost:
+                em = discord.Embed(description="```diff\n- You need {} more Gold to buy this item.```".format(value), color=discord.Color.red())
+                await self.bot.say(embed=em)
+            else:
+                cost = 1000
+                userinfo["gold"] = userinfo["gold"] - cost
+                userinfo["inventory"].append("Sprine Bow")
+                fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
+                em = discord.Embed(description="```diff\n+ You bought the item for {} Gold.```".format(cost), color=discord.Color.blue())
+                await self.bot.say(embed=em)
+
+        elif item == "sprine staff":
+            if not userinfo["class"] == "Mage":
+                em = discord.Embed(description="```diff\n- You need to be a Mage to buy this item.```", color=discord.Color.red())
+                await self.bot.say(embed=em)
+                return
+            cost = 1000
+            value = cost - userinfo["gold"]
+            if userinfo["gold"] < cost:
+                em = discord.Embed(description="```diff\n- You need {} more Gold to buy this item.```".format(value), color=discord.Color.red())
+                await self.bot.say(embed=em)
+            else:
+                cost = 1000
+                userinfo["gold"] = userinfo["gold"] - cost
+                userinfo["inventory"].append("Sprine Staff")
+                fileIO("data/alcher/players/{}/info.json".format(user.id), "save", userinfo)
+                em = discord.Embed(description="```diff\n+ You bought the item for {} Gold.```".format(cost), color=discord.Color.blue())
+                await self.bot.say(embed=em)
+        else:
+            em = discord.Embed(description="```diff\n- You have requested to buy an invalid item.\n\n+ To see the list of the items, type >items```", color=discord.Color.red())
+            await self.bot.say(embed=em)
+
+    @commands.command(pass_context=True)
+    async def items(self, ctx, *, Class):
+        user = ctx.message.author
+        if Class == "Mage" or Class == "mage":
+            em = discord.Embed(description="```diff\n+ Item list for the Mage Class.```\n\n1) Sprine Staff - [1,000 Gold]", color=discord.Color.blue())
+            await self.bot.say(embed=em)
+        elif Class == "Paladin" or Class == "paladin":
+            em = discord.Embed(description="```diff\n+ Item list for the Paladin Class.```\n\n1) Sprine Sword - [1,000 Gold]", color=discord.Color.blue())
+            await self.bot.say(embed=em)
+        elif Class == "Thief" or Class == "thief":
+            em = discord.Embed(description="```diff\n+ Item list for the Thief Class.```\n\n1) Sprine Dagger - [1,000 Gold]", color=discord.Color.blue())
+            await self.bot.say(embed=em)
+        elif Class == "Archer" or Class == "archer":
+            em = discord.Embed(description="```diff\n+ Item list for the Archer Class.```\n\n1) Sprine Bow - [1,000 Gold]", color=discord.Color.blue())
+            await self.bot.say(embed=em)
+        else:
+            em = discord.Embed(description="```diff\n- That is not a valid Class.```", color=discord.Color.red())
+            await self.bot.say(embed=em)
 
     @commands.command(pass_context = True)
     async def heal(self, ctx):
@@ -509,6 +666,7 @@ class AlcherRPG:
         else:
             em = discord.Embed(description="```diff\n- You don't have any health potions!```", color=discord.Color.red())
             await self.bot.say(embed=em)
+
 
     @commands.command(pass_context=True)
     async def daily(self, ctx):
