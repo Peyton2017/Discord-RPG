@@ -18,14 +18,9 @@ try:
 except:
     pass
 
-#[Bows] * [Basic Bow] [Sharp Bow]
-#[Swords] * [Basic shortblade] - [Basic longblade]
-#[Daggers] * [Basic Dagger] - [Sharp Dagger]
-#[Magic] * [Basic Staff] [Sharp Staff]
-
 prefix = fileIO("data/red/settings.json", "load")['PREFIXES']
 
-dev = ["135204842544168961"]
+dev = ["312127693242236928"]
 
 class AlcherRPG:
     def __init__(self, bot):
